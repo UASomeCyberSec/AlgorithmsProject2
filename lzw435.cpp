@@ -217,55 +217,100 @@ bool is_number(const std::string& s)
     return !s.empty() && it == s.end();
 }
 
-// demo of how LZW works
-
-int main()
+int main(int argc, char *argv[])
 {
-   std::ifstream inputFile;
-   std::ofstream outputFile;
-   std::vector<int> compressed;
-   std::vector<int> compressedCheck;
-
-   // write file to example
-   std::string example = "";
-   inputFile.open("TestText.txt");
-   while (!inputFile.eof())
+   if(argc != 3 || (argv[1][0]!='c' && argv[1][0]!='v'))
    {
-      std::string line;
-      std::getline(inputFile, line);
-      example += line;
+      std::cout << "Usage: " << argv[0] << " c|v <filename>\n";
    }
-
-   inputFile.close();
-   outputFile.open("TestText.lzw");
-
-   compress(example, std::back_inserter(compressed));
-   for (auto itr = compressed.begin(); itr != compressed.end(); itr++)
+   else
    {
-      std::cout << "\n" << *itr;
-      outputFile << *itr << "\n";
+      std::string filename = argv[2];
+      std::ifstream inputFile;
+      std::ofstream outputFile;
+      std::vector<int> compressed;
+      std::vector<int> compressedCheck;
+
+      // write file to string
+      std::string input = "";
+      inputFile.open(filename + ".txt");
+      if(inputFile.is_open())
+      {
+         while (!inputFile.eof())
+         {
+            std::string line;
+            std::getline(inputFile, line);
+            input += line;
+         }
+      }
+      else
+      {
+         std::cout << "Error: Could not open file " << filename << ".txt\n";
+         return 0;
+      }
+      inputFile.close();
+
+      if(argv[1][0]=='c')
+      {
+         std::cout << "Compressing " << filename << " to " << filename << ".lzw\n";
+         outputFile.open(filename + ".lzw");
+         if(outputFile.is_open())
+         {
+            compress(input, std::back_inserter(compressed));
+            for (auto itr = compressed.begin(); itr != compressed.end(); itr++)
+            {
+               std::cout << "\n" << *itr;
+               outputFile << *itr << "\n";
+            }
+            outputFile.close();
+         }
+         else
+         {
+            std::cout << "Error: Could not open file " << filename << ".lzw\n";
+            return 0;
+         }
+      }
+      else
+      {
+         std::string decompressed = "";
+         std::cout << "Decompressing " << filename << " to " << filename << ".lzw\n";
+         inputFile.open(filename + ".lzw");
+         if(inputFile.is_open())
+         {
+            while (!inputFile.eof())
+            {
+               std::string line;
+               std::getline(inputFile, line);
+               if(is_number(line))
+                  compressedCheck.push_back(std::stoi(line));
+            }
+
+            decompressed = decompress(compressedCheck.begin(), compressedCheck.end());
+            std::cout << "\nfinal decompressed: " << decompressed << std::endl;
+         }
+         else
+         {
+            std::cout << "Error: Could not open file " << filename << ".lzw\n";
+            return 0;
+         }
+
+         outputFile.open(filename + "2.txt");
+         if(outputFile.is_open())
+         {
+            outputFile << decompressed;
+            outputFile.close();
+         }
+         else
+         {
+            std::cout << "Error: Could not open file " << filename << "2.txt\n";
+            return 0;
+         }
+      }
+
+      // demo as the name suggests
+      std::cout << "\n ---------- binary IO demo ----------- \n";
+      binaryIODemo(compressed);
    }
-
-   outputFile.close();
-
-   inputFile.open("TestText.lzw");
-   while (!inputFile.eof())
-   {
-      std::string line;
-      std::getline(inputFile, line);
-      if(is_number(line))
-         compressedCheck.push_back(std::stoi(line));
-   }
-
-   std::string decompressed = decompress(compressedCheck.begin(), compressedCheck.end());
-   std::cout << "\nfinal decompressed: " << decompressed << std::endl;
-
-   outputFile.open("TestText2.txt");
-   outputFile << decompressed;
-
-   // demo as the name suggests
-   std::cout << "\n ---------- binary IO demo ----------- \n";
-   binaryIODemo(compressed);
 
    return 0;
 }
