@@ -1,3 +1,8 @@
+/*
+    Nathan Brannan
+    nb121@uakron.edu
+*/
+
 #include <string>
 #include <map>
 #include <iostream>
@@ -93,9 +98,12 @@ bool is_number(const std::string &s)
 
 int main(int argc, char **argv)
 {
+    // Check for first c|e type arguments
     if (argc != 3 || (argv[1][0] != 'c' && argv[1][0] != 'e'))
     {
         std::string argvIndex1(argv[1]);
+
+        // Check for diff argument
         if (argc != 4 || argvIndex1 != "diff")
         {
             std::cout << "Options:\n";
@@ -110,6 +118,8 @@ int main(int argc, char **argv)
             std::string input1, input2;
             inputFile1.open(filename1 + ".txt");
             inputFile2.open(filename2 + ".txt");
+            
+            // Check whether two inputted files are the same or different
             if (inputFile1.is_open() && inputFile2.is_open())
             {
                 std::string line;
@@ -160,9 +170,10 @@ int main(int argc, char **argv)
         std::vector<int> compressed;
         std::vector<int> compressedCheck;
 
+        // Handle argument for compressing <filename>
         if (argv[1][0] == 'c')
         {
-            // write file to string
+            // Write file to string
             std::string input;
             inputFile.open(filename + ".txt");
             if (inputFile.is_open())
@@ -181,7 +192,7 @@ int main(int argc, char **argv)
             }
             inputFile.close();
 
-            // compress file to .lzw
+            // Compress file to .lzw
             std::cout << "Compressing " << filename << " to " << filename << ".lzw\n";
             outputFile.open(filename + ".lzw");
             if (outputFile.is_open())
@@ -203,7 +214,8 @@ int main(int argc, char **argv)
         }
         else
         {
-            // decompress .lzw file
+            // Handle argument for decompressing <filename.lzw>
+            // Decompress .lzw file
             std::string decompressed;
             std::cout << "Decompressing " << filename << "\n";
             inputFile.open(filename);
@@ -226,6 +238,7 @@ int main(int argc, char **argv)
                 return 0;
             }
 
+            // Write decompressed text to <filename>2.txt
             filename.resize(filename.size() - 4);
             outputFile.open(filename + "2.txt");
             if (outputFile.is_open())
