@@ -222,7 +222,52 @@ int main(int argc, char **argv)
 {
     if (argc != 3 || (argv[1][0] != 'c' && argv[1][0] != 'e'))
     {
-        std::cout << "Usage: " << argv[0] << " c|e <filename>\n";
+        std::string argvIndex1(argv[1]);
+        if (argc != 4 || argvIndex1 != "diff")
+        {
+            std::cout << "Options:\n";
+            std::cout << "Usage: " << argv[0] << " diff <filename> <filename2>\n";
+            std::cout << "Usage: " << argv[0] << " c|e <filename>\n";
+        }
+        else
+        {
+            std::string filename1 = argv[2];
+            std::string filename2 = argv[3];
+            std::ifstream inputFile1, inputFile2;
+            std::string input1, input2;
+            inputFile1.open(filename1 + ".txt");
+            inputFile2.open(filename2 + ".txt");
+            if (inputFile1.is_open() && inputFile2.is_open())
+            {
+                std::string line;
+                while (!inputFile1.eof())
+                {
+                    std::getline(inputFile1, line);
+                    input1 += line;
+                }
+                while (!inputFile2.eof())
+                {
+                    std::getline(inputFile2, line);
+                    input2 += line;
+                }
+                
+                if (input1 == input2)
+                {
+                    std::cout << "File content is the same\n";
+                }
+                else
+                {
+                    std::cout << "File content is different:\n";
+                    std::cout << "File 1: " << input1 << "\n";
+                    std::cout << "File 2: " << input2 << "\n";
+                }
+            }
+            else
+            {
+                std::cout << "Error: Could not open files " << filename1 << ".txt & " << filename2 << ".txt\n";
+                return 0;
+            }
+        }
     }
     else
     {
@@ -235,7 +280,7 @@ int main(int argc, char **argv)
         if (argv[1][0] == 'c')
         {
             // write file to string
-            std::string input = "";
+            std::string input;
             inputFile.open(filename + ".txt");
             if (inputFile.is_open())
             {
@@ -272,15 +317,11 @@ int main(int argc, char **argv)
                 std::cout << "Error: Could not open file " << filename << ".lzw\n";
                 return 0;
             }
-
-            // binary demo
-            std::cout << "\n ---------- binary IO demo ----------- \n";
-            binaryIODemo(compressed);
         }
         else
         {
             // decompress .lzw file
-            std::string decompressed = "";
+            std::string decompressed;
             std::cout << "Decompressing " << filename << "\n";
             inputFile.open(filename);
             if (inputFile.is_open())
